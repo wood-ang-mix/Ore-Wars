@@ -30,7 +30,8 @@ fun SimpleScaffold(
             )
         },
         content = {
-            WoodBox(modifier = Modifier.padding(0.dp).fillMaxSize()) {
+            WoodBox(modifier = Modifier.padding(0.dp).fillMaxSize(
+            )) {
                 content(it)
             }
         }

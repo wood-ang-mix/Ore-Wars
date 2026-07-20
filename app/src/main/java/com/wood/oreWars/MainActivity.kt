@@ -6,8 +6,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,7 +35,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OreWarsTheme {
-                Surface{ OreWarsApp(gameMap = gameMap) }
+                Surface(color = Color.Black){ OreWarsApp(gameMap = gameMap) }
             }
         }
     }
@@ -39,7 +47,21 @@ fun OreWarsApp(gameMap: GameMap) {
     val activity = LocalContext.current as Activity
     NavHost(
         navController,
-        startDestination = "home"
+        startDestination = "home",
+        enterTransition = {
+            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(550, easing = FastOutSlowInEasing))
+        },
+        exitTransition = {
+            fadeOut(tween(550, easing = FastOutSlowInEasing)) +
+                    slideOutVertically(tween(550, easing = FastOutSlowInEasing)) { -it / 4 }
+        },
+        popEnterTransition = {
+            fadeIn(tween(550, easing = FastOutSlowInEasing)) +
+                    slideInVertically(tween(550, easing = FastOutSlowInEasing)) { -it / 4 }
+        },
+        popExitTransition = {
+            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down, tween(550, easing = FastOutSlowInEasing))
+        }
     ){
         composable("home") { HomeScreen(navController, activity) }
         composable("single_game") { GameScreen(navController, gameMap) }
