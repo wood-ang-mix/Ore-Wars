@@ -17,13 +17,23 @@ android {
         //noinspection OldTargetApi
         targetSdk = 36
         versionCode = 1
-        versionName = "0.1"
+        versionName = "26.07.20Dome"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\42512\\OreWarsKey")
+            storePassword = "130623"
+            keyAlias = ""
+            keyPassword = "TODO_密码"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             optimization {
                 enable = false
             }
