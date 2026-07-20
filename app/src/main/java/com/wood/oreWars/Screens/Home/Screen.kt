@@ -50,7 +50,7 @@ fun HomeScreen(nav: NavController, activity: Activity) {
                 Box{
                     StoneButton({ ifShowMenu = true}, text = "开始游戏")
                     DropdownMenu(expanded = ifShowMenu, onDismissRequest = { ifShowMenu = false }) {
-                        DropdownMenuItem(text = { Text("单人游戏") }, onClick = { nav.navigate("single_game"); ifShowMenu = false })
+                        DropdownMenuItem(text = { Text("剧情模式") }, onClick = { nav.navigate("single_game"); ifShowMenu = false })
                         DropdownMenuItem(text = { Text("多人游戏") }, onClick = { nav.navigate("multi_game"); ifShowMenu = false })
                     }
                 }

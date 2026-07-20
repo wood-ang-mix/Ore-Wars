@@ -1,10 +1,16 @@
 package com.wood.oreWars.backend
 
 import androidx.annotation.Nullable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import com.wood.oreWars.R
 import com.wood.oreWars.backend.item.Item
 import com.wood.oreWars.backend.ore.Ore
 import com.wood.oreWars.backend.ore.RedStone
+import kotlin.contracts.ExperimentalContracts
 
 open class Block (
     contentOre: Ore? = RedStone(),
@@ -30,11 +36,15 @@ open class Block (
     }
 
     @Composable
-    fun Composable(){
-        if (contentOre) {
-            contentOre.Composable()
+    fun Composable(modifier: Modifier = Modifier.fillMaxSize()){
+        if (contentOre != null) {
+            contentOre!!.Composable()
         }else{
-
+            Image(
+                painter = painterResource(id = R.drawable.stone),
+                contentDescription = "stone",
+                modifier = modifier
+            )
         }
     }
 }
