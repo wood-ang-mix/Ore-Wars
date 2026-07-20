@@ -12,6 +12,6 @@ open class RedStone : Ore() {
     override val imageId: Int = R.drawable.red_stone
     @Composable
     override fun Composable(modifier: Modifier){
-        Image(painter = painterResource(id = imageId), contentDescription = name, modifier = modifier)
+        Render(imageId)
     }
 }

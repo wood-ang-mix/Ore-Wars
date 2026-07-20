@@ -8,20 +8,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.wood.oreWars.backend.GameMap
+import com.wood.oreWars.composable.MapGrid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(nav: NavController){
+fun GameScreen(nav: NavController, gameMap: GameMap){
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("单人游戏") }
+                title = { Text("剧情模式") }
             )
         }
     ) { innerPadding ->
-        Text(
-            text = "(游戏界面)",
-            modifier = Modifier.padding(innerPadding)
-        )
+        MapGrid(gameMap = gameMap)
     }
 }

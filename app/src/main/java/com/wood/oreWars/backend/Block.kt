@@ -38,7 +38,7 @@ open class Block (
     @Composable
     fun Composable(modifier: Modifier = Modifier.fillMaxSize()){
         if (contentOre != null) {
-            contentOre!!.Composable()
+            contentOre!!.Composable(modifier)
         }else{
             Image(
                 painter = painterResource(id = R.drawable.stone),

@@ -7,6 +7,9 @@ import android.graphics.BitmapShader
 import android.graphics.Shader.TileMode
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.LocalContentColor
@@ -39,7 +42,8 @@ fun WoodBox(
         ShaderBrush(shader)
     }
     Box(
-        modifier = modifier.background(brush = brush),
+        modifier = modifier
+            .background(brush = brush),
         contentAlignment = Alignment.Center
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {

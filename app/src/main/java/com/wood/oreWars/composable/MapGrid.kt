@@ -1,19 +1,48 @@
 package com.wood.oreWars.composable
 
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.wood.oreWars.backend.GameMap
+
+private val BLOCK_SIZE = 40.dp
 
 @Composable
 fun MapGrid(
     gameMap: GameMap,
     modifier: Modifier = Modifier
 ){
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(gameMap.size),
+    val scrollStateH = rememberScrollState()
+    val scrollStateV = rememberScrollState()
+
+    Box(
+        modifier = modifier
+            .horizontalScroll(scrollStateH)
+            .verticalScroll(scrollStateV)
     ) {
-        //TODO("在此处绘制地图，用网格规划排列，绘制用gameMap里边的Block的composable绘制，在地图外部套一层WoodBox作为地图的边框，在WoodBox外边套一层可滚动的组件让地图过大时可以滚动内部的WoodBox查看")
+        WoodBox(modifier = modifier.padding(8.dp)) {
+            Column {
+                for (y in 0 until gameMap.size) {
+                    Row {
+                        for (x in 0 until gameMap.size) {
+                            gameMap[x, y].Composable(
+                                modifier = Modifier.size(BLOCK_SIZE)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        Box(modifier = Modifier.height(126.dp))
     }
 }
