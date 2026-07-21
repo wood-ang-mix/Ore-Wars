@@ -28,7 +28,7 @@ import com.wood.oreWars.ui.theme.OreWarsTheme
 
 class MainActivity : ComponentActivity() {
 
-    var gameMap = GameMap(32) // 32x32 map
+    var gameMap = GameMap(23) // 23x23 map
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

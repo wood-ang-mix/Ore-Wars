@@ -1,65 +1,144 @@
 package com.wood.oreWars.composable
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import com.wood.oreWars.R
 import com.wood.oreWars.backend.GameMap
+import com.wood.oreWars.util.drawableToBase64
 
-val BLOCK_SIZE = 21.dp
+private const val BLOCK_SIZE_DP = 36
 
 @Composable
 fun MapGrid(
     gameMap: GameMap,
     modifier: Modifier = Modifier,
     onClick: (Int, Int) -> Unit = gameMap.onClick
-){
-    val scrollStateH = rememberScrollState()
-    val scrollStateV = rememberScrollState()
+) {
+    val context = LocalContext.current
+    val density = context.resources.displayMetrics.density
+    val blockPx = (BLOCK_SIZE_DP * density).toInt()
+    val clickCallback = rememberUpdatedState(onClick)
 
-    Column(
-        modifier = modifier.windowInsetsPadding(WindowInsets.systemBars)
-    ) {
-        Box(modifier = Modifier.fillMaxWidth().height(63.dp))
+    val html = remember(gameMap.size, blockPx) {
+        buildHtml(
+            stoneBase64 = context.drawableToBase64(R.drawable.stone),
+            redStoneBase64 = context.drawableToBase64(R.drawable.red_stone),
+            woodBase64 = context.drawableToBase64(R.drawable.wood, scaleDiv = 6),
+            size = gameMap.size,
+            blockPx = blockPx
+        )
+    }
 
-        Box(
-            modifier = Modifier
-                .horizontalScroll(scrollStateH)
-                .verticalScroll(scrollStateV)
-        ) {
-            WoodBox(modifier = Modifier.padding(8.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    for (y in 0 until gameMap.size) {
-                        Row {
-                            for (x in 0 until gameMap.size) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(BLOCK_SIZE)
-                                        .clickable { onClick(x, y) }
-                                ) {
-                                    gameMap[x, y].Composable(
-                                        modifier = Modifier.size(BLOCK_SIZE)
-                                    )
-                                }
-                            }
-                        }
+    AndroidView(
+        modifier = modifier,
+        factory = { ctx ->
+            WebView(ctx).apply {
+                settings.javaScriptEnabled = true
+                settings.domStorageEnabled = false
+                setBackgroundColor(0x00000000)
+                overScrollMode = WebView.OVER_SCROLL_NEVER
+
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        val json = gameMap.toJson()
+                        view?.evaluateJavascript("renderMap('$json')", null)
                     }
                 }
+
+                addJavascriptInterface(object {
+                    @JavascriptInterface
+                    fun onBlockClick(x: Int, y: Int) {
+                        post { clickCallback.value(x, y) }
+                    }
+                }, "Android")
+
+                loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
             }
-            Box(modifier = Modifier.height(126.dp))
         }
-    }
+    )
+}
+
+private fun buildHtml(
+    stoneBase64: String,
+    redStoneBase64: String,
+    woodBase64: String,
+    size: Int,
+    blockPx: Int
+): String {
+    return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+            <style>
+                * { margin: 0; padding: 0; }
+                body {
+                    overflow: auto;
+                    background-image: url($woodBase64);
+                    background-repeat: repeat;
+                }
+                canvas { display: block; }
+            </style>
+        </head>
+        <body>
+            <canvas id="map"></canvas>
+            <script>
+                const BLOCK_SIZE = $blockPx;
+                const SIZE = $size;
+                const IMAGES = {
+                    stone: "$stoneBase64",
+                    redstone: "$redStoneBase64"
+                };
+                let mapData = [];
+                const loadedImages = {};
+
+                function preloadImages(callback) {
+                    const keys = Object.keys(IMAGES);
+                    let count = 0;
+                    keys.forEach(key => {
+                        const img = new Image();
+                        img.onload = () => {
+                            loadedImages[key] = img;
+                            count++;
+                            if (count === keys.length) callback();
+                        };
+                        img.src = IMAGES[key];
+                    });
+                }
+
+                function renderMap(json) {
+                    mapData = JSON.parse(json);
+                    const canvas = document.getElementById('map');
+                    canvas.width = SIZE * BLOCK_SIZE;
+                    canvas.height = SIZE * BLOCK_SIZE;
+                    const ctx = canvas.getContext('2d');
+                    preloadImages(() => {
+                        mapData.forEach(block => {
+                            const img = loadedImages[block.ore] || loadedImages['stone'];
+                            ctx.drawImage(img, block.x * BLOCK_SIZE, block.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                        });
+                    });
+                }
+
+                document.getElementById('map').addEventListener('click', e => {
+                    const rect = e.target.getBoundingClientRect();
+                    const x = Math.floor((e.clientX - rect.left) / BLOCK_SIZE);
+                    const y = Math.floor((e.clientY - rect.top) / BLOCK_SIZE);
+                    if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
+                        Android.onBlockClick(x, y);
+                    }
+                });
+
+            </script>
+        </body>
+        </html>
+    """.trimIndent()
 }
