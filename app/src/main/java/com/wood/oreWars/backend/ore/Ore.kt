@@ -20,14 +20,12 @@ abstract class Ore {
     abstract fun Composable(modifier: Modifier = Modifier)
 
     @Composable
-    protected fun Render(imageId: Int, modifier: Modifier = Modifier.size(BLOCK_SIZE.dp)){
-//        Box{
-            Image(
-                painter = painterResource(id = imageId),
-                contentDescription = name,
-                modifier = modifier
-            )
-//        }
+    protected fun Render(imageId: Int, modifier: Modifier = Modifier){
+        Image(
+            painter = painterResource(id = imageId),
+            contentDescription = name,
+            modifier = modifier
+        )
     }
 
     override fun toString() = name
