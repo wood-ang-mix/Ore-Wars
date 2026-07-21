@@ -25,6 +25,9 @@ import com.wood.oreWars.Screens.MultiGameScreen
 import com.wood.oreWars.Screens.Setting.SettingScreen
 import com.wood.oreWars.backend.Block
 import com.wood.oreWars.backend.GameMap
+import com.wood.oreWars.backend.item.Book
+import com.wood.oreWars.backend.item.GoldApple
+import com.wood.oreWars.backend.ore.Gold
 import com.wood.oreWars.backend.ore.RedStone as R
 import com.wood.oreWars.backend.ore.Lapis as L
 import com.wood.oreWars.backend.ore.Coal as C
@@ -39,13 +42,13 @@ class MainActivity : ComponentActivity() {
         size = 23,
         map = Array(23) { y ->
             Array(23) { x ->
-                when {
-                    x in 1..5  && y in 1..5   -> R().Block()   // 红石国 (左上)
-                    x in 6..10 && y in 1..5   -> L().Block()   // 青金石国 (紧挨红石)
-                    x in 13..17 && y in 1..5  -> C().Block()   // 煤炭国 (右上)
-                    x in 8..12 && y in 8..12  -> G().Block()   // 金国 (中)
-                    x in 1..5  && y in 14..18 -> P().Block()   // 铜国 (左下)
-                    x in 14..18 && y in 14..18 -> D().Block()  // 钻石国 (右下)
+                when (x) {
+                    in 1..5 if y in 1..5 -> R().Block()                                                       // 红石国 (左上)
+                    in 6..10 if y in 1..5 -> Block(L(), mutableListOf(Book(), GoldApple()))        // 青金石国 (紧挨红石)
+                    in 13..17 if y in 1..5 -> C().Block()                                                       // 煤炭国 (右上)
+                    in 8..12 if y in 8..12 -> Block(G(), mutableListOf(GoldApple()))   // 金国 (中)
+                    in 1..5 if y in 14..18 -> P().Block()                                                        // 铜国 (左下)
+                    in 14..18 if y in 14..18 -> D().Block()                                                       // 钻石国 (右下)
                     else -> Block(contentOre = null)           // 空地
                 }
             }

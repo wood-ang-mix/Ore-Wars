@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.wood.oreWars.backend.ClickTarget
 import com.wood.oreWars.backend.GameMap
 import com.wood.oreWars.composable.MapGrid
 import kotlinx.coroutines.launch
@@ -38,14 +39,25 @@ fun GameScreen(nav: NavController, gameMap: GameMap){
             .height(61.dp))
         MapGrid(
             gameMap = gameMap,
-            onClick = { x, y ->
+            onClick = { target ->
                 scope.launch {
-                    snackbarHostState.showSnackbar(
-                        "调试信息:\n" +
-                                "[位置] (${x + 1}, ${y + 1})\n" +
-                                "[内容] ${gameMap[x, y].contentOre}\n" +
-                                "[是否为陆地] ${gameMap[x, y].isLand}"
-                    )
+                    when (target) {
+                        is ClickTarget.Block -> {
+                            snackbarHostState.showSnackbar(
+                                "调试信息:点击了区块\n" +
+                                        "[位置] (${target.x + 1}, ${target.y + 1})\n" +
+                                        "[内容] ${gameMap[target.x, target.y].contentOre}\n" +
+                                        "[是否为陆地] ${gameMap[target.x, target.y].isLand}"
+                            )
+                        }
+                        is ClickTarget.Item -> {
+                            snackbarHostState.showSnackbar(
+                                "调试信息:点击了物品\n" +
+                                        "[位置] (${target.x + 1}, ${target.y + 1})\n" +
+                                        "[物品] ${target.itemName}"
+                            )
+                        }
+                    }
                 }
             }
         )
