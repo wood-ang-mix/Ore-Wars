@@ -23,12 +23,30 @@ import com.wood.oreWars.Screens.SingleGame.GameScreen
 import com.wood.oreWars.Screens.Home.HomeScreen
 import com.wood.oreWars.Screens.MultiGameScreen
 import com.wood.oreWars.Screens.Setting.SettingScreen
+import com.wood.oreWars.backend.Block
 import com.wood.oreWars.backend.GameMap
+import com.wood.oreWars.backend.ore.RedStone as R
+import com.wood.oreWars.backend.ore.Lapis as L
+import com.wood.oreWars.backend.ore.Coal as C
+import com.wood.oreWars.backend.ore.Gold as G
 import com.wood.oreWars.ui.theme.OreWarsTheme
 
 class MainActivity : ComponentActivity() {
 
-    var gameMap = GameMap(23) // 23x23 map
+    var gameMap = GameMap(
+        size = 23,
+        map = Array(23) { y ->
+            Array(23) { x ->
+                when (x) {
+                    in 1..5 if y in 1..5 -> R().Block()   // 红石国 (左上)
+                    in 6..10 if y in 1..5 -> L().Block()   // 青金石国 (紧挨红石)
+                    in 13..17 if y in 1..5 -> C().Block()   // 煤炭国 (右上)
+                    in 8..12 if y in 8..12 -> G().Block()   // 金国 (中下)
+                    else -> Block(contentOre = null)          // 空地
+                }
+            }
+        }
+    ) // 23x23: 红石↔青金挨着, 四国间有间隔
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

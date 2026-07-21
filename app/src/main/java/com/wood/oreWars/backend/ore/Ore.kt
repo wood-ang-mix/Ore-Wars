@@ -1,23 +1,16 @@
 package com.wood.oreWars.backend.ore
 
-import android.nfc.tech.MifareClassic.BLOCK_SIZE
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-
-import kotlin.contracts.ExperimentalContracts
+import com.wood.oreWars.backend.Block
 
 abstract class Ore {
     protected abstract val name: String
     protected abstract val imageId: Int
-
-    @Composable
-    abstract fun Composable(modifier: Modifier = Modifier)
+    protected abstract val maxHealth: Int
+    protected var health = maxHealth
 
     @Composable
     protected fun Render(imageId: Int, modifier: Modifier = Modifier){
@@ -29,4 +22,6 @@ abstract class Ore {
     }
 
     override fun toString() = name
+
+    fun Block() = Block(this)
 }

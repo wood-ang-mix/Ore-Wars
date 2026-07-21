@@ -1,5 +1,7 @@
 package com.wood.oreWars.composable
 
+import android.annotation.SuppressLint
+import android.nfc.tech.MifareClassic.BLOCK_SIZE
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -13,8 +15,8 @@ import com.wood.oreWars.R
 import com.wood.oreWars.backend.GameMap
 import com.wood.oreWars.util.drawableToBase64
 
-private const val BLOCK_SIZE_DP = 36
 
+@SuppressLint("LocalContextResourcesRead", "SetJavaScriptEnabled")
 @Composable
 fun MapGrid(
     gameMap: GameMap,
@@ -23,16 +25,25 @@ fun MapGrid(
 ) {
     val context = LocalContext.current
     val density = context.resources.displayMetrics.density
-    val blockPx = (BLOCK_SIZE_DP * density).toInt()
+    val blockPx = (BLOCK_SIZE * density).toInt()
     val clickCallback = rememberUpdatedState(onClick)
 
     val html = remember(gameMap.size, blockPx) {
+        val oreImages = mapOf(
+            "stone"    to context.drawableToBase64(R.drawable.stone),
+            "redstone" to context.drawableToBase64(R.drawable.red_stone),
+            "lapis"    to context.drawableToBase64(R.drawable.lapis),
+            "coal"     to context.drawableToBase64(R.drawable.coal),
+            "gold"     to context.drawableToBase64(R.drawable.gold),
+            "copper"   to context.drawableToBase64(R.drawable.copper),
+            "diamond"  to context.drawableToBase64(R.drawable.diamond),
+        )
+        val woodBase64 = context.drawableToBase64(R.drawable.wood, scaleDiv = 6)
         buildHtml(
-            stoneBase64 = context.drawableToBase64(R.drawable.stone),
-            redStoneBase64 = context.drawableToBase64(R.drawable.red_stone),
-            woodBase64 = context.drawableToBase64(R.drawable.wood, scaleDiv = 6),
+            oreImages = oreImages,
+            woodBase64 = woodBase64,
             size = gameMap.size,
-            blockPx = blockPx
+            blockSize = blockPx
         )
     }
 
@@ -66,13 +77,11 @@ fun MapGrid(
 }
 
 private fun buildHtml(
-    stoneBase64: String,
-    redStoneBase64: String,
+    oreImages: Map<String, String>,
     woodBase64: String,
     size: Int,
-    blockPx: Int
-): String {
-    return """
+    blockSize: Int
+) = """
         <!DOCTYPE html>
         <html>
         <head>
@@ -91,11 +100,10 @@ private fun buildHtml(
         <body>
             <canvas id="map"></canvas>
             <script>
-                const BLOCK_SIZE = $blockPx;
+                const BLOCK_SIZE = $blockSize;
                 const SIZE = $size;
                 const IMAGES = {
-                    stone: "$stoneBase64",
-                    redstone: "$redStoneBase64"
+${oreImages.entries.joinToString(",\n") { """                    ${it.key}: "${it.value}"""" }}
                 };
                 let mapData = [];
                 const loadedImages = {};
@@ -141,4 +149,3 @@ private fun buildHtml(
         </body>
         </html>
     """.trimIndent()
-}
