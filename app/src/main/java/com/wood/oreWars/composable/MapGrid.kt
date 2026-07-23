@@ -32,7 +32,7 @@ fun MapGrid(
     val html = remember(gameMap.size, blockPx) {
         val images = mapOf(
             // 矿石贴图
-            "stone"    to context.drawableToBase64(R.drawable.stone),
+            "grass"    to context.drawableToBase64(R.drawable.grass),
             "redstone" to context.drawableToBase64(R.drawable.red_stone),
             "lapis"    to context.drawableToBase64(R.drawable.lapis),
             "coal"     to context.drawableToBase64(R.drawable.coal),
@@ -141,7 +141,7 @@ ${images.entries.joinToString(",\n") { """                    ${it.key}: "${it.v
                     const ctx = canvas.getContext('2d');
                     preloadImages(() => {
                         mapData.forEach(block => {
-                            const img = loadedImages[block.ore] || loadedImages['stone'];
+                            const img = loadedImages[block.ore] || loadedImages['grass'];
                             ctx.drawImage(img, block.x * BLOCK_SIZE, block.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                             // 渲染物品
                             if (block.items && block.items.length > 0) {

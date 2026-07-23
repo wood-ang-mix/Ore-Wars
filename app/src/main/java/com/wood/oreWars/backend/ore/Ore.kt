@@ -9,9 +9,7 @@ import com.wood.oreWars.backend.Block
 abstract class Ore {
     protected abstract val name: String
     protected abstract val imageId: Int
-    protected abstract val maxHealth: Int
-    protected var health = maxHealth
-
+    abstract val maxHealth: Int
     @Composable
     protected fun Render(imageId: Int, modifier: Modifier = Modifier){
         Image(
